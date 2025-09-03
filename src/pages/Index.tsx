@@ -42,11 +42,6 @@ const Index = () => {
   const [showAuthModal, setShowAuthModal] = useState(true);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [authForm, setAuthForm] = useState({ email: '', password: '', name: '' });
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(true);
-  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [authForm, setAuthForm] = useState({ email: '', password: '', name: '' });
 
   const mockUsers: User[] = [
     { id: '1', name: 'Алексей Петров', status: 'online' },
