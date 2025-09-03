@@ -37,6 +37,16 @@ const Index = () => {
   const [activeChat, setActiveChat] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(true);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [authForm, setAuthForm] = useState({ email: '', password: '', name: '' });
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(true);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [authForm, setAuthForm] = useState({ email: '', password: '', name: '' });
 
   const mockUsers: User[] = [
     { id: '1', name: 'Алексей Петров', status: 'online' },
@@ -129,10 +139,88 @@ const Index = () => {
     setShowEmojiPicker(false);
   };
 
+  const handleAuth = () => {
+    // Мокап авторизации
+    if (authForm.email && authForm.password) {
+      setIsAuthenticated(true);
+      setShowAuthModal(false);
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-100">
+        <Card className="w-96 p-6 shadow-xl">
+          <div className="text-center mb-6">
+            <Icon name="MessageCircle" size={48} className="text-primary mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-gray-900">Добро пожаловать</h1>
+            <p className="text-gray-600">Войдите в свой аккаунт или создайте новый</p>
+          </div>
+          
+          <div className="space-y-4">
+            {authMode === 'register' && (
+              <Input
+                placeholder="Имя"
+                value={authForm.name}
+                onChange={(e) => setAuthForm(prev => ({ ...prev, name: e.target.value }))}
+              />
+            )}
+            <Input
+              type="email"
+              placeholder="Email"
+              value={authForm.email}
+              onChange={(e) => setAuthForm(prev => ({ ...prev, email: e.target.value }))}
+            />
+            <Input
+              type="password"
+              placeholder="Пароль"
+              value={authForm.password}
+              onChange={(e) => setAuthForm(prev => ({ ...prev, password: e.target.value }))}
+            />
+            
+            <Button onClick={handleAuth} className="w-full">
+              {authMode === 'login' ? 'Войти' : 'Зарегистрироваться'}
+            </Button>
+            
+            <Button
+              variant="ghost"
+              onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
+              className="w-full"
+            >
+              {authMode === 'login' ? 'Создать аккаунт' : 'Уже есть аккаунт?'}
+            </Button>
+          </div>
+          
+          <div className="mt-6 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+            <p className="text-sm text-yellow-700">
+              ⚠️ Демо режим: введите любой email и пароль
+            </p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-screen flex bg-gray-50 font-sans">
+    <div className="h-screen flex bg-gray-50 font-sans relative">
+      {/* Кнопка назад для полноэкранного режима */}
+      {isFullscreen && (
+        <Button
+          variant="ghost"
+          onClick={() => setIsFullscreen(false)}
+          className="absolute top-4 left-4 z-50 bg-white shadow-md"
+        >
+          <Icon name="ArrowLeft" size={20} />
+        </Button>
+      )}
+      
+      <div className={`h-screen flex bg-gray-50 font-sans transition-all duration-300 ${
+        isFullscreen ? 'absolute inset-0 z-40' : ''
+      }`}>
       {/* Левая панель - список чатов */}
-      <div className="w-1/3 bg-white border-r border-gray-200 flex flex-col">
+      <div className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ${
+        isFullscreen ? 'w-0 overflow-hidden' : 'w-1/3'
+      }`}>
         {/* Заголовок */}
         <div className="p-4 border-b border-gray-200 bg-primary text-white">
           <h1 className="text-xl font-semibold">Мессенджер</h1>
@@ -158,7 +246,10 @@ const Index = () => {
           {mockChats.map((chat) => (
             <div
               key={chat.id}
-              onClick={() => setActiveChat(chat.id)}
+              onClick={() => {
+                setActiveChat(chat.id);
+                setIsFullscreen(true);
+              }}
               className={`p-3 border-b border-gray-100 cursor-pointer transition-colors hover:bg-gray-50 ${
                 activeChat === chat.id ? 'bg-accent' : ''
               }`}
@@ -336,7 +427,9 @@ const Index = () => {
       </div>
 
       {/* Правая панель - контакты и статусы */}
-      <div className="w-80 bg-white border-l border-gray-200 flex flex-col">
+      <div className={`bg-white border-l border-gray-200 flex flex-col transition-all duration-300 ${
+        isFullscreen ? 'w-0 overflow-hidden' : 'w-80'
+      }`}>
         <div className="p-4 border-b border-gray-200">
           <h3 className="font-semibold text-lg flex items-center gap-2">
             <Icon name="Users" size={20} />
@@ -396,6 +489,7 @@ const Index = () => {
           </div>
         </ScrollArea>
       </div>
+    </div>
     </div>
   );
 };
